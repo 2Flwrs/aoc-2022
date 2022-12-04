@@ -1,33 +1,39 @@
-pub mod day1;
-pub use day1::Day1Arg;
+mod day1;
+mod day2;
+mod day3;
+mod day4;
 
-pub mod day2;
-pub use day2::Day2Arg;
+use anyhow::{anyhow, Result};
+use clap::Args;
+use std::{fs::File, io::BufReader};
 
-pub mod day3;
-pub use day3::Day3Arg;
+use crate::common::{input_filename, PuzzleStage};
 
-pub mod day4;
-pub use day4::Day4Arg;
-
-use anyhow::Result;
-use clap::Subcommand;
-
-#[derive(Subcommand)]
-pub enum DayCommand {
-    Day1(Day1Arg),
-    Day2(Day2Arg),
-    Day3(Day3Arg),
-    Day4(Day4Arg),
+#[derive(Args)]
+pub struct PuzzleArgs {
+    day: usize,
+    stage: PuzzleStage,
+    #[arg(short, long)]
+    real: bool,
 }
 
-impl DayCommand {
+impl PuzzleArgs {
     pub(crate) fn run(self) -> Result<()> {
-        match self {
-            DayCommand::Day1(arg) => arg.run(),
-            DayCommand::Day2(arg) => arg.run(),
-            DayCommand::Day3(arg) => arg.run(),
-            DayCommand::Day4(arg) => arg.run(),
-        }
+        println!("AoC Day {}", self.day);
+        let path = input_filename(self.day, self.real);
+        println!("using file {}", path.to_string_lossy());
+
+        let r = File::open(path)?;
+        let r = BufReader::new(r);
+
+        match self.day {
+            1 => day1::day1_run(r, self.stage),
+            2 => day2::day2_run(r, self.stage),
+            3 => day3::day3_run(r, self.stage), 
+            4 => day4::day4_run(r, self.stage), 
+            _ => Err(anyhow!("bad day: {}", self.day)),
+        }?;
+
+        Ok(())
     }
 }

@@ -1,69 +1,53 @@
-use crate::common::{input_filename, PuzzleStage};
+use crate::common::PuzzleStage;
 use anyhow::Result;
-use clap::Args;
 use parse_display::{Display, FromStr};
 use std::{cmp::Ordering, io::BufRead, str::FromStr};
-use std::{fs::File, io::BufReader};
 
-const DAY: usize = 2;
-
-#[derive(Args, Debug)]
-pub struct Day2Arg {
-    stage: PuzzleStage,
-    #[arg(short, long)]
-    real: bool,
+pub(crate) fn day2_run<R: BufRead>(r: R, stage: PuzzleStage) -> Result<()> {
+    let answer = match stage {
+        PuzzleStage::First => day2_stage1(r),
+        PuzzleStage::Second => day2_stage2(r),
+    }?;
+    println!("{answer}");
+    Ok(())
 }
 
-impl Day2Arg {
-    pub(crate) fn run(self) -> Result<()> {
-        println!("AoC Day {}", DAY);
-        let path = input_filename(DAY, self.real);
-        println!("using file {}", path.to_string_lossy());
-
-        let r = File::open(path)?;
-        let r = BufReader::new(r);
-
-        let mut data = vec![];
-
-        for line in r.lines() {
-            let line = line?;
-            if line.trim().is_empty() {
-                continue;
-            }
-
-            let row = Row::from_str(line.trim())?;
-            data.push(row);
+fn load_data<R: BufRead>(r: R) -> Result<Vec<Data>> {
+    let mut data = vec![];
+    for line in r.lines() {
+        let line = line?;
+        if line.trim().is_empty() {
+            continue;
         }
 
-        println!("Loaded {} sets of data", data.len());
-
-        match self.stage {
-            PuzzleStage::First => first_stage(&data),
-            PuzzleStage::Second => second_stage(&data),
-        }
+        let row = Data::from_str(line.trim())?;
+        data.push(row);
     }
+    println!("Loaded {} sets of data", data.len());
+    Ok(data)
 }
 
-fn first_stage(data: &[Row]) -> Result<()> {
-    let score = data.iter().map(Row::calc1).sum::<usize>();
-    println!("Total score: {score}");
-    Ok(())
+fn day2_stage1<R: BufRead>(r: R) -> Result<String> {
+    let data = load_data(r)?;
+
+    let score = data.iter().map(Data::calc1).sum::<usize>();
+    Ok(format!("Total score: {score}"))
 }
 
-fn second_stage(data: &[Row]) -> Result<(), anyhow::Error> {
-    let score = data.iter().map(Row::calc2).sum::<usize>();
-    println!("Total score: {score}");
-    Ok(())
+fn day2_stage2<R: BufRead>(r: R) -> Result<String> {
+    let data = load_data(r)?;
+    let score = data.iter().map(Data::calc2).sum::<usize>();
+    Ok(format!("Total score: {score}"))
 }
 
 #[derive(Display, FromStr, PartialEq, Debug)]
 #[display("{left} {right}")]
-struct Row {
+struct Data {
     left: Left,
     right: Right,
 }
 
-impl Row {
+impl Data {
     fn calc1(&self) -> usize {
         let opponent = self.left.as_rps();
         let played = self.right.as_rps();

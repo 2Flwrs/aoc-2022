@@ -1,76 +1,62 @@
-use crate::common::{input_filename, PuzzleStage};
+use crate::common::PuzzleStage;
 use anyhow::Result;
-use clap::Args;
 use std::io::BufRead;
-use std::{fs::File, io::BufReader};
 
-const DAY: usize = 1;
-
-#[derive(Args, Debug)]
-pub struct Day1Arg {
-    stage: PuzzleStage,
-    #[arg(short, long)]
-    real: bool,
-}
-
-impl Day1Arg {
-    pub(crate) fn run(self) -> Result<()> {
-        println!("AoC Day {}", DAY);
-        let path = input_filename(DAY, self.real);
-        println!("using file {}", path.to_string_lossy());
-
-        let r = File::open(path)?;
-        let r = BufReader::new(r);
-
-        let mut data = vec![];
-        let mut set = vec![];
-
-        for line in r.lines() {
-            let line = line?;
-            if line.trim().is_empty() {
-                if !set.is_empty() {
-                    data.push(set);
-                    set = vec![];
-                }
-            } else {
-                let value: usize = line.trim().parse()?;
-                set.push(value)
-            }
-        }
-        if !set.is_empty() {
-            data.push(set);
-        }
-
-        println!("Loaded {} sets of data", data.len());
-
-        match self.stage {
-            PuzzleStage::First => first_stage(&data),
-            PuzzleStage::Second => second_stage(&data),
-        }
-    }
-}
-
-fn first_stage(data: &[Vec<usize>]) -> Result<()> {
-    let max = data
-        .iter()
-        .map(|set| set.iter().sum::<usize>())
-        .max()
-        .ok_or_else(|| anyhow::anyhow!("no max?"))?;
-
-    println!("Max sum: {max}");
+pub(crate) fn day1_run<R: BufRead>(r: R, stage: PuzzleStage) -> Result<()> {
+    let answer = match stage {
+        PuzzleStage::First => day1_stage1(r),
+        PuzzleStage::Second => day1_stage2(r),
+    }?;
+    println!("{answer}");
     Ok(())
 }
 
-fn second_stage(data: &[Vec<usize>]) -> Result<(), anyhow::Error> {
+struct Data(Vec<usize>);
+
+fn load_data<R: BufRead>(r: R) -> Result<Vec<Data>> {
+    let mut data = vec![];
+    let mut set = vec![];
+    for line in r.lines() {
+        let line = line?;
+        if line.trim().is_empty() {
+            if !set.is_empty() {
+                data.push(Data(set));
+                set = vec![];
+            }
+        } else {
+            let value: usize = line.trim().parse()?;
+            set.push(value)
+        }
+    }
+    if !set.is_empty() {
+        data.push(Data(set));
+    }
+    Ok(data)
+}
+
+fn day1_stage1<R: BufRead>(r: R) -> Result<String> {
+    let data = load_data(r)?;
+
+    let max = data
+        .iter()
+        .map(|Data(set)| set.iter().sum::<usize>())
+        .max()
+        .ok_or_else(|| anyhow::anyhow!("no max?"))?;
+
+    Ok(format!("Max sum: {max}"))
+}
+
+fn day1_stage2<R: BufRead>(r: R) -> Result<String> {
+    let data = load_data(r)?;
+
     let mut totals = data
         .iter()
-        .map(|set| set.iter().sum::<usize>())
+        .map(|Data(set)| set.iter().sum::<usize>())
         .collect::<Vec<_>>();
 
     totals.sort_unstable_by(|a, b| a.cmp(b).reverse());
 
     let sum3 = totals.iter().take(3).sum::<usize>();
 
-    println!("Sum of top 3: {sum3}");
-    Ok(())
+    Ok(format!("Sum of top 3: {sum3}"))
 }

@@ -1,19 +1,18 @@
 mod common;
 mod days;
 use clap::Parser;
-use days::*;
+use days::PuzzleArgs;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
-#[command(propagate_version = true)]
 struct Cli {
-    #[command(subcommand)]
-    day_command: DayCommand,
+    #[command(flatten)]
+    puzzle_args: PuzzleArgs,
 }
 
 fn main() {
     let cli = Cli::parse();
-    if let Err(e) = cli.day_command.run() {
+    if let Err(e) = cli.puzzle_args.run() {
         eprintln!("command failed with error {:?}", e);
     }
 }

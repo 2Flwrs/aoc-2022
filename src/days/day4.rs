@@ -1,52 +1,42 @@
-use crate::common::{input_filename, PuzzleStage};
+use crate::common::PuzzleStage;
 use anyhow::Result;
-use clap::Args;
 use std::io::BufRead;
-use std::{fs::File, io::BufReader};
 
-const DAY: usize = 4;
-
-#[derive(Args, Debug)]
-pub struct Day4Arg {
-    stage: PuzzleStage,
-    #[arg(short, long)]
-    real: bool,
+pub(crate) fn day4_run<R: BufRead>(r: R, stage: PuzzleStage) -> Result<()> {
+    let answer = match stage {
+        PuzzleStage::First => day4_stage1(r),
+        PuzzleStage::Second => day4_stage2(r),
+    }?;
+    println!("{answer}");
+    Ok(())
 }
 
-impl Day4Arg {
-    pub(crate) fn run(self) -> Result<()> {
-        println!("AoC Day {}", DAY);
-        let path = input_filename(DAY, self.real);
-        println!("using file {}", path.to_string_lossy());
-
-        let r = File::open(path)?;
-        let r = BufReader::new(r);
-
-        let mut data = vec![];
-
-        for line in r.lines() {
-            let line = line?;
-            if line.trim().is_empty() {
-                continue;
-            }
-
-            data.push(line);
+fn load_data<R: BufRead>(r: R) -> Result<Vec<Data>> {
+    let mut data = vec![];
+    for line in r.lines() {
+        let line = line?;
+        if line.trim().is_empty() {
+            continue;
         }
 
-        println!("Loaded {} sets of data", data.len());
-        dbg!(&data);
-
-        match self.stage {
-            PuzzleStage::First => first_stage(&data),
-            PuzzleStage::Second => second_stage(&data),
-        }
+        data.push(Data());
+        todo!()
     }
+    println!("Loaded {} sets of data", data.len());
+    Ok(data)
 }
 
-fn first_stage(_data: &[String]) -> Result<()> {
+fn day4_stage1<R: BufRead>(r: R) -> Result<String> {
+    let data = load_data(r)?;
+    dbg!(&data);
     todo!()
 }
 
-fn second_stage(_data: &[String]) -> Result<(), anyhow::Error> {
+fn day4_stage2<R: BufRead>(r: R) -> Result<String> {
+    let data = load_data(r)?;
+    dbg!(&data);
     todo!()
 }
+
+#[derive(Debug)]
+struct Data();

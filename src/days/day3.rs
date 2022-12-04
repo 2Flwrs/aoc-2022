@@ -1,57 +1,43 @@
-use crate::common::{input_filename, PuzzleStage};
 use anyhow::{anyhow, Result};
-use clap::Args;
 use itertools::Itertools;
 use std::{collections::HashSet, io::BufRead};
-use std::{fs::File, io::BufReader};
 
-const DAY: usize = 3;
+use crate::common::PuzzleStage;
 
-#[derive(Args, Debug)]
-pub struct Day3Arg {
-    stage: PuzzleStage,
-    #[arg(short, long)]
-    real: bool,
+pub(crate) fn day3_run<R: BufRead>(r: R, stage: PuzzleStage) -> Result<()> {
+    let answer = match stage {
+        PuzzleStage::First => day3_stage1(r),
+        PuzzleStage::Second => day3_stage2(r),
+    }?;
+    println!("{answer}");
+    Ok(())
 }
 
-impl Day3Arg {
-    pub(crate) fn run(self) -> Result<()> {
-        println!("AoC Day {}", DAY);
-        let path = input_filename(DAY, self.real);
-        println!("using file {}", path.to_string_lossy());
-
-        let r = File::open(path)?;
-        let r = BufReader::new(r);
-
-        let mut data = vec![];
-
-        for line in r.lines() {
-            let line = line?;
-            if line.trim().is_empty() {
-                continue;
-            }
-
-            let entry = Data::from_line(&line)?;
-            data.push(entry);
+fn load_data<R: BufRead>(r: R) -> Result<Vec<Data>> {
+    let mut data = vec![];
+    for line in r.lines() {
+        let line = line?;
+        if line.trim().is_empty() {
+            continue;
         }
 
-        println!("Loaded {} sets of data", data.len());
-
-        match self.stage {
-            PuzzleStage::First => first_stage(&data),
-            PuzzleStage::Second => second_stage(&data),
-        }
+        let entry = Data::from_line(&line)?;
+        data.push(entry);
     }
+    println!("Loaded {} sets of data", data.len());
+    Ok(data)
 }
 
-fn first_stage(_data: &[Data]) -> Result<()> {
-    let value = _data
+fn day3_stage1<R: BufRead>(r: R) -> Result<String> {
+    let data = load_data(r)?;
+
+    let value = data
         .iter()
         .map(split_data)
         .map_ok(|(l, r)| matching(&l, &r) as usize)
         .sum::<Result<usize, _>>()?;
-    println!("Sum of prio: {value}");
-    Ok(())
+
+    Ok(format!("Sum of prio: {value}"))
 }
 
 fn split_data(data: &Data) -> Result<(Vec<u8>, Vec<u8>)> {
@@ -78,7 +64,8 @@ fn matching(l: &[u8], r: &[u8]) -> u8 {
     y[0]
 }
 
-fn second_stage(data: &[Data]) -> Result<(), anyhow::Error> {
+fn day3_stage2<R: BufRead>(r: R) -> Result<String> {
+    let data = load_data(r)?;
     let chunks = data.chunks_exact(3);
     if !chunks.remainder().is_empty() {
         return Err(anyhow!("not divided into even chunks"));
@@ -86,8 +73,7 @@ fn second_stage(data: &[Data]) -> Result<(), anyhow::Error> {
 
     let total = chunks.map(calc_common).sum::<Result<usize, _>>()?;
 
-    println!("Total badge prio: {total}");
-    Ok(())
+    Ok(format!("Total badge prio: {total}"))
 }
 
 fn calc_common(chunk: &[Data]) -> Result<usize> {

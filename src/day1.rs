@@ -1,23 +1,13 @@
-use crate::common::PuzzleStage;
 use anyhow::Result;
-use std::io::BufRead;
-
-pub(crate) fn day1_run<R: BufRead>(r: R, stage: PuzzleStage) -> Result<()> {
-    let answer = match stage {
-        PuzzleStage::First => day1_stage1(r),
-        PuzzleStage::Second => day1_stage2(r),
-    }?;
-    println!("{answer}");
-    Ok(())
-}
+use aoc_runner_derive::{aoc, aoc_generator};
 
 struct Data(Vec<usize>);
 
-fn load_data<R: BufRead>(r: R) -> Result<Vec<Data>> {
+#[aoc_generator(day1)]
+fn parse_data(input: &str) -> Result<Vec<Data>> {
     let mut data = vec![];
     let mut set = vec![];
-    for line in r.lines() {
-        let line = line?;
+    for line in input.lines() {
         if line.trim().is_empty() {
             if !set.is_empty() {
                 data.push(Data(set));
@@ -34,21 +24,19 @@ fn load_data<R: BufRead>(r: R) -> Result<Vec<Data>> {
     Ok(data)
 }
 
-fn day1_stage1<R: BufRead>(r: R) -> Result<String> {
-    let data = load_data(r)?;
-
+#[aoc(day1, part1)]
+fn part1(data: &[Data]) -> Result<usize> {
     let max = data
         .iter()
         .map(|Data(set)| set.iter().sum::<usize>())
         .max()
         .ok_or_else(|| anyhow::anyhow!("no max?"))?;
 
-    Ok(format!("Max sum: {max}"))
+    Ok(max)
 }
 
-fn day1_stage2<R: BufRead>(r: R) -> Result<String> {
-    let data = load_data(r)?;
-
+#[aoc(day1, part2)]
+fn part2(data: &[Data]) -> Result<usize> {
     let mut totals = data
         .iter()
         .map(|Data(set)| set.iter().sum::<usize>())
@@ -58,5 +46,25 @@ fn day1_stage2<R: BufRead>(r: R) -> Result<String> {
 
     let sum3 = totals.iter().take(3).sum::<usize>();
 
-    Ok(format!("Sum of top 3: {sum3}"))
+    Ok(sum3)
+}
+
+#[cfg(test)]
+mod test {
+    const SHORT_INPUT: &str =
+        "1000\n2000\n3000\n\n4000\n\n5000\n6000\n\n7000\n8000\n9000\n\n10000\n";
+
+    #[test]
+    fn part1() {
+        let data = super::parse_data(SHORT_INPUT).unwrap();
+        let answer = super::part1(&data).unwrap();
+        assert_eq!(answer, 24000);
+    }
+
+    #[test]
+    fn part2() {
+        let data = super::parse_data(SHORT_INPUT).unwrap();
+        let answer = super::part2(&data).unwrap();
+        assert_eq!(answer, 45000);
+    }
 }

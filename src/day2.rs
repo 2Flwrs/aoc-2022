@@ -1,21 +1,12 @@
-use crate::common::PuzzleStage;
 use anyhow::Result;
+use aoc_runner_derive::{aoc, aoc_generator};
 use parse_display::{Display, FromStr};
-use std::{cmp::Ordering, io::BufRead, str::FromStr};
+use std::{cmp::Ordering, str::FromStr};
 
-pub(crate) fn day2_run<R: BufRead>(r: R, stage: PuzzleStage) -> Result<()> {
-    let answer = match stage {
-        PuzzleStage::First => day2_stage1(r),
-        PuzzleStage::Second => day2_stage2(r),
-    }?;
-    println!("{answer}");
-    Ok(())
-}
-
-fn load_data<R: BufRead>(r: R) -> Result<Vec<Data>> {
+#[aoc_generator(day2)]
+fn parse_data(input: &str) -> Result<Vec<Data>> {
     let mut data = vec![];
-    for line in r.lines() {
-        let line = line?;
+    for line in input.lines() {
         if line.trim().is_empty() {
             continue;
         }
@@ -23,21 +14,19 @@ fn load_data<R: BufRead>(r: R) -> Result<Vec<Data>> {
         let row = Data::from_str(line.trim())?;
         data.push(row);
     }
-    println!("Loaded {} sets of data", data.len());
     Ok(data)
 }
 
-fn day2_stage1<R: BufRead>(r: R) -> Result<String> {
-    let data = load_data(r)?;
-
+#[aoc(day2, part1)]
+fn part1(data: &[Data]) -> Result<usize> {
     let score = data.iter().map(Data::calc1).sum::<usize>();
-    Ok(format!("Total score: {score}"))
+    Ok(score)
 }
 
-fn day2_stage2<R: BufRead>(r: R) -> Result<String> {
-    let data = load_data(r)?;
+#[aoc(day2, part2)]
+fn part2(data: &[Data]) -> Result<usize> {
     let score = data.iter().map(Data::calc2).sum::<usize>();
-    Ok(format!("Total score: {score}"))
+    Ok(score)
 }
 
 #[derive(Display, FromStr, PartialEq, Debug)]
@@ -176,5 +165,24 @@ impl PartialOrd for Rps {
                 Rps::S => Ordering::Equal,
             },
         })
+    }
+}
+
+#[cfg(test)]
+mod test {
+    const SHORT_INPUT: &str = "A Y\nB X\nC Z\n";
+
+    #[test]
+    fn part1() {
+        let data = super::parse_data(SHORT_INPUT).unwrap();
+        let answer = super::part1(&data).unwrap();
+        assert_eq!(answer, 15);
+    }
+
+    #[test]
+    fn part2() {
+        let data = super::parse_data(SHORT_INPUT).unwrap();
+        let answer = super::part2(&data).unwrap();
+        assert_eq!(answer, 12);
     }
 }

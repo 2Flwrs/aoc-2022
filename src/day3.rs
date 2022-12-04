@@ -1,22 +1,12 @@
 use anyhow::{anyhow, Result};
+use aoc_runner_derive::{aoc, aoc_generator};
 use itertools::Itertools;
-use std::{collections::HashSet, io::BufRead};
+use std::collections::HashSet;
 
-use crate::common::PuzzleStage;
-
-pub(crate) fn day3_run<R: BufRead>(r: R, stage: PuzzleStage) -> Result<()> {
-    let answer = match stage {
-        PuzzleStage::First => day3_stage1(r),
-        PuzzleStage::Second => day3_stage2(r),
-    }?;
-    println!("{answer}");
-    Ok(())
-}
-
-fn load_data<R: BufRead>(r: R) -> Result<Vec<Data>> {
+#[aoc_generator(day3)]
+fn parse_data(input: &str) -> Result<Vec<Data>> {
     let mut data = vec![];
-    for line in r.lines() {
-        let line = line?;
+    for line in input.lines() {
         if line.trim().is_empty() {
             continue;
         }
@@ -24,20 +14,18 @@ fn load_data<R: BufRead>(r: R) -> Result<Vec<Data>> {
         let entry = Data::from_line(&line)?;
         data.push(entry);
     }
-    println!("Loaded {} sets of data", data.len());
     Ok(data)
 }
 
-fn day3_stage1<R: BufRead>(r: R) -> Result<String> {
-    let data = load_data(r)?;
-
+#[aoc(day3, part1)]
+fn part1(data: &[Data]) -> Result<usize> {
     let value = data
         .iter()
         .map(split_data)
         .map_ok(|(l, r)| matching(&l, &r) as usize)
         .sum::<Result<usize, _>>()?;
 
-    Ok(format!("Sum of prio: {value}"))
+    Ok(value)
 }
 
 fn split_data(data: &Data) -> Result<(Vec<u8>, Vec<u8>)> {
@@ -64,8 +52,8 @@ fn matching(l: &[u8], r: &[u8]) -> u8 {
     y[0]
 }
 
-fn day3_stage2<R: BufRead>(r: R) -> Result<String> {
-    let data = load_data(r)?;
+#[aoc(day3, part2)]
+fn part2(data: &[Data]) -> Result<usize> {
     let chunks = data.chunks_exact(3);
     if !chunks.remainder().is_empty() {
         return Err(anyhow!("not divided into even chunks"));
@@ -73,7 +61,7 @@ fn day3_stage2<R: BufRead>(r: R) -> Result<String> {
 
     let total = chunks.map(calc_common).sum::<Result<usize, _>>()?;
 
-    Ok(format!("Total badge prio: {total}"))
+    Ok(total)
 }
 
 fn calc_common(chunk: &[Data]) -> Result<usize> {
@@ -111,5 +99,24 @@ fn prio(c: char) -> Result<u8> {
         'a'..='z' => Ok((c as u8 - 'a' as u8) + 1),
         'A'..='Z' => Ok((c as u8 - 'A' as u8) + 27),
         _ => Err(anyhow!("invalid character")),
+    }
+}
+
+#[cfg(test)]
+mod test {
+    const SHORT_INPUT: &str = "vJrwpWtwJgWrhcsFMMfFFhFp\njqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL\nPmmdzqPrVvPwwTWBwg\nwMqvLMZHhHMvwLHjbvcjnnSBnvTQFn\nttgJtRGJQctTZtZT\nCrZsJsPPZsGzwwsLwLmpwMDw\n";
+
+    #[test]
+    fn part1() {
+        let data = super::parse_data(SHORT_INPUT).unwrap();
+        let answer = super::part1(&data).unwrap();
+        assert_eq!(answer, 157);
+    }
+
+    #[test]
+    fn part2() {
+        let data = super::parse_data(SHORT_INPUT).unwrap();
+        let answer = super::part2(&data).unwrap();
+        assert_eq!(answer, 70);
     }
 }

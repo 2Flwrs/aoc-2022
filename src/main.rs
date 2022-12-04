@@ -1,18 +1,5 @@
-mod common;
-mod days;
-use clap::Parser;
-use days::PuzzleArgs;
+use aoc_runner_derive::aoc_main;
 
-#[derive(Parser)]
-#[command(author, version, about, long_about = None)]
-struct Cli {
-    #[command(flatten)]
-    puzzle_args: PuzzleArgs,
-}
+extern crate aoc_2022;
 
-fn main() {
-    let cli = Cli::parse();
-    if let Err(e) = cli.puzzle_args.run() {
-        eprintln!("command failed with error {:?}", e);
-    }
-}
+aoc_main! { lib = aoc_2022 }

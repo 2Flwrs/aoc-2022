@@ -1,48 +1,37 @@
-use crate::common::PuzzleStage;
 use anyhow::Result;
+use aoc_runner_derive::{aoc, aoc_generator};
 use parse_display::{Display, FromStr};
-use std::io::BufRead;
 
-pub(crate) fn day4_run<R: BufRead>(r: R, stage: PuzzleStage) -> Result<()> {
-    let answer = match stage {
-        PuzzleStage::First => day4_stage1(r),
-        PuzzleStage::Second => day4_stage2(r),
-    }?;
-    println!("{answer}");
-    Ok(())
-}
-
-fn load_data<R: BufRead>(r: R) -> Result<Vec<Data>> {
+#[aoc_generator(day4)]
+fn parse_data(input: &str) -> Result<Vec<Data>> {
     let mut data: Vec<Data> = vec![];
-    for line in r.lines() {
-        let line = line?;
+    for line in input.lines() {
         if line.trim().is_empty() {
             continue;
         }
         data.push(line.parse()?);
     }
-    println!("Loaded {} sets of data", data.len());
     Ok(data)
 }
 
-fn day4_stage1<R: BufRead>(r: R) -> Result<String> {
-    let data = load_data(r)?;
+#[aoc(day4, part1)]
+fn part1(data: &[Data]) -> Result<usize> {
     let count = data
         .iter()
         .filter_map(|Data(a, b)| (a.contains(b) || b.contains(a)).then_some(()))
         .count();
 
-    Ok(format!("Complete overlaps: {count}"))
+    Ok(count)
 }
 
-fn day4_stage2<R: BufRead>(r: R) -> Result<String> {
-    let data = load_data(r)?;
+#[aoc(day4, part2)]
+fn part2(data: &[Data]) -> Result<usize> {
     let count = data
         .iter()
         .filter_map(|Data(a, b)| a.overlaps(b).then_some(()))
         .count();
 
-    Ok(format!("Overlaps: {count}"))
+    Ok(count)
 }
 
 #[derive(Display, FromStr, Clone, Copy)]
@@ -73,5 +62,24 @@ impl ElfRange {
         (self.low <= other.high && self.low >= other.low)
             || (self.high <= other.high && self.high >= other.low)
             || (self.low < other.low && self.high > other.high)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    const SHORT_INPUT: &str = "2-4,6-8\n2-3,4-5\n5-7,7-9\n2-8,3-7\n6-6,4-6\n2-6,4-8\n";
+
+    #[test]
+    fn part1() {
+        let data = super::parse_data(SHORT_INPUT).unwrap();
+        let answer = super::part1(&data).unwrap();
+        assert_eq!(answer, 2);
+    }
+
+    #[test]
+    fn part2() {
+        let data = super::parse_data(SHORT_INPUT).unwrap();
+        let answer = super::part2(&data).unwrap();
+        assert_eq!(answer, 4);
     }
 }

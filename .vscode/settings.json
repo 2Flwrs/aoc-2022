@@ -1,0 +1,5 @@
+{
+    "rust-analyzer.imports.granularity.enforce": true,
+    "rust-analyzer.inlayHints.bindingModeHints.enable": true,
+    "rust-analyzer.inlayHints.closureReturnTypeHints.enable": "with_block"
+}

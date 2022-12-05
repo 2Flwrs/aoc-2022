@@ -170,18 +170,18 @@ impl PartialOrd for Rps {
 
 #[cfg(test)]
 mod test {
-    const SHORT_INPUT: &str = "A Y\nB X\nC Z\n";
+    const EXAMPLE_INPUT: &str = include_str!("../input/2022/day2.example.txt");
 
     #[test]
     fn part1() {
-        let data = super::parse_data(SHORT_INPUT).unwrap();
+        let data = super::parse_data(EXAMPLE_INPUT).unwrap();
         let answer = super::part1(&data).unwrap();
         assert_eq!(answer, 15);
     }
 
     #[test]
     fn part2() {
-        let data = super::parse_data(SHORT_INPUT).unwrap();
+        let data = super::parse_data(EXAMPLE_INPUT).unwrap();
         let answer = super::part2(&data).unwrap();
         assert_eq!(answer, 12);
     }

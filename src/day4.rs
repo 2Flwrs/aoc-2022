@@ -67,18 +67,18 @@ impl ElfRange {
 
 #[cfg(test)]
 mod test {
-    const SHORT_INPUT: &str = "2-4,6-8\n2-3,4-5\n5-7,7-9\n2-8,3-7\n6-6,4-6\n2-6,4-8\n";
+    const EXAMPLE_INPUT: &str = include_str!("../input/2022/day4.example.txt");
 
     #[test]
     fn part1() {
-        let data = super::parse_data(SHORT_INPUT).unwrap();
+        let data = super::parse_data(EXAMPLE_INPUT).unwrap();
         let answer = super::part1(&data).unwrap();
         assert_eq!(answer, 2);
     }
 
     #[test]
     fn part2() {
-        let data = super::parse_data(SHORT_INPUT).unwrap();
+        let data = super::parse_data(EXAMPLE_INPUT).unwrap();
         let answer = super::part2(&data).unwrap();
         assert_eq!(answer, 4);
     }

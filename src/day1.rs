@@ -51,19 +51,18 @@ fn part2(data: &[Data]) -> Result<usize> {
 
 #[cfg(test)]
 mod test {
-    const SHORT_INPUT: &str =
-        "1000\n2000\n3000\n\n4000\n\n5000\n6000\n\n7000\n8000\n9000\n\n10000\n";
+    const EXAMPLE_INPUT: &str = include_str!("../input/2022/day1.example.txt");
 
     #[test]
     fn part1() {
-        let data = super::parse_data(SHORT_INPUT).unwrap();
+        let data = super::parse_data(EXAMPLE_INPUT).unwrap();
         let answer = super::part1(&data).unwrap();
         assert_eq!(answer, 24000);
     }
 
     #[test]
     fn part2() {
-        let data = super::parse_data(SHORT_INPUT).unwrap();
+        let data = super::parse_data(EXAMPLE_INPUT).unwrap();
         let answer = super::part2(&data).unwrap();
         assert_eq!(answer, 45000);
     }

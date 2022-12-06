@@ -67,19 +67,20 @@ impl ElfRange {
 
 #[cfg(test)]
 mod test {
+    use super::{parse_data, part1, part2};
+    use anyhow::Result;
+
     const EXAMPLE_INPUT: &str = include_str!("../input/2022/day4.example.txt");
 
     #[test]
-    fn part1() {
-        let data = super::parse_data(EXAMPLE_INPUT).unwrap();
-        let answer = super::part1(&data).unwrap();
-        assert_eq!(answer, 2);
+    fn part1_example() -> Result<()> {
+        assert_eq!(part1(&parse_data(EXAMPLE_INPUT)?)?, 2);
+        Ok(())
     }
 
     #[test]
-    fn part2() {
-        let data = super::parse_data(EXAMPLE_INPUT).unwrap();
-        let answer = super::part2(&data).unwrap();
-        assert_eq!(answer, 4);
+    fn part2_example() -> Result<()> {
+        assert_eq!(part2(&parse_data(EXAMPLE_INPUT)?)?, 4);
+        Ok(())
     }
 }

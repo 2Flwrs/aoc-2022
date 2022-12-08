@@ -80,7 +80,7 @@ impl<T: Clone, I: Iterator<Item = T>> Iterator for IterWindows<T, I> {
 
 #[cfg(test)]
 mod test {
-    use super::{part1_tuples, part1_generic, part2};
+    use super::{part1_generic, part1_tuples, part2};
     use anyhow::Result;
 
     #[test]

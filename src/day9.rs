@@ -102,7 +102,7 @@ fn part2(data: &Input) -> Result<usize> {
         for _ in 0..m.steps {
             rope[0] += delta;
             for i in 1..ROPE_LENGTH {
-                let target = rope[i-1];
+                let target = rope[i - 1];
                 rope[i].move_towards(target);
             }
             covered.insert(rope.last().unwrap().clone());
@@ -132,11 +132,15 @@ fn plot(rope: &Vec<PosXY>, covered: &HashSet<PosXY>) {
     for y in (min_y..=max_y).rev() {
         for x in min_x..=max_x {
             let pos = PosXY::new(x, y);
-            if let Some(i) = rope.iter().find_position(|p| pos==**p).map(|(i,_)| i) {
+            if let Some(i) = rope.iter().find_position(|p| pos == **p).map(|(i, _)| i) {
                 match i {
-                    0 => {print!("H");},
-                    1..=9 => {print!("{i}");}
-                    _ => panic!("unexpected")
+                    0 => {
+                        print!("H");
+                    }
+                    1..=9 => {
+                        print!("{i}");
+                    }
+                    _ => panic!("unexpected"),
                 }
             } else if covered.contains(&pos) {
                 print!("#");
@@ -150,7 +154,7 @@ fn plot(rope: &Vec<PosXY>, covered: &HashSet<PosXY>) {
 
 #[cfg(test)]
 mod test {
-    use super::{part2, parse_data, part1};
+    use super::{parse_data, part1, part2};
     use anyhow::Result;
 
     const EXAMPLE_INPUT: &str = include_str!("../input/2022/day9.example.txt");

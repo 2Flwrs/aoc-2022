@@ -60,9 +60,9 @@ fn part1(pgm: &Program) -> Result<i32> {
         if current_target.map_or(false, |targ| new_cycle > targ) {
             let targ = current_target.unwrap();
             let strength = x * targ;
-            println!(
-                "Before applying {ins}, advancing to {new_cycle}, add {x} * {targ} = {strength}"
-            );
+            // println!(
+            //     "Before applying {ins}, advancing to {new_cycle}, add {x} * {targ} = {strength}"
+            // );
             value += strength;
             current_target = targets.next();
         }
